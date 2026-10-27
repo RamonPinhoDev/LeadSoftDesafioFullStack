@@ -5,7 +5,11 @@ Desafio full stack com API em ASP.NET Core e frontend Angular, com cadastro de c
 
 
 
+## 🎥 Demonstração do Projeto
 
+[<img width="245" height="125" alt="Assistir ao vídeo" src="https://github.com/user-attachments/assets/c9f5db40-1222-494a-80e9-10a079a1fa8b" />](https://youtu.be/mfVCOHNCReM)
+
+**Clique na imagem acima para assistir à demonstração do projeto.**
 ## Projetos
 
 - `LeadSoftDesafioBackend/`: solução .NET 10 com API, aplicação, domínio e infraestrutura RavenDB.
