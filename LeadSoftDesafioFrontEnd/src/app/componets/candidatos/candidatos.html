@@ -1,0 +1,395 @@
+@if (detalhes) {
+  <section class="page-shell">
+    <a class="text-link back-link" routerLink="/admin">← Todos os candidatos</a>
+    <header class="page-heading">
+      <p class="eyebrow">ADMINISTRAÇÃO / INSCRIÇÃO</p>
+      <h1>Detalhes do candidato</h1>
+      <p>Dados da inscrição, fotos e comentários em um só lugar.</p>
+    </header>
+    @if (erro()) {
+      <div class="alert alert-danger" role="alert">
+        {{ erro() }}
+        <button class="text-link" (click)="carregar()" [disabled]="carregando()">
+          Tentar novamente
+        </button>
+      </div>
+    }
+    @if (aviso()) {
+      <div class="alert alert-success" role="status">{{ aviso() }}</div>
+    }
+    @if (carregando()) {
+      <div class="empty-state" role="status">
+        <span class="spinner-border text-primary" aria-hidden="true"></span>
+        <p>Carregando inscrição…</p>
+      </div>
+    }
+    @if (candidato(); as pessoa) {
+      <div class="panel personal-panel">
+        <div class="heading-actions">
+          <div>
+            <h2>{{ pessoa.nome }}</h2>
+            <p class="muted">Dados pessoais</p>
+          </div>
+          <button
+            class="btn btn-outline-danger"
+            (click)="confirmarCandidato.set(true)"
+            [disabled]="excluindo() || enviandoFoto() || enviandoComentario()"
+          >
+            Excluir inscrição
+          </button>
+        </div>
+        <dl class="personal-data">
+          <div>
+            <dt>CPF</dt>
+            <dd>{{ pessoa.cpf || 'Não informado' }}</dd>
+          </div>
+          <div>
+            <dt>E-mail</dt>
+            <dd>{{ pessoa.email }}</dd>
+          </div>
+          <div>
+            <dt>Data de nascimento</dt>
+            <dd>{{ pessoa.dataNascimento | date: 'dd/MM/yyyy' }}</dd>
+          </div>
+        </dl>
+        @if (confirmarCandidato()) {
+          <section class="delete-confirm">
+            <h3>Confirmar exclusão de {{ pessoa.nome }}?</h3>
+            <p>A inscrição deixará de aparecer na galeria. Esta ação não pode ser desfeita.</p>
+            <div class="button-row">
+              <button
+                class="btn btn-danger"
+                (click)="excluirCandidato()"
+                [disabled]="excluindo() || enviandoFoto() || enviandoComentario()"
+              >
+                {{ excluindo() ? 'Excluindo…' : 'Confirmar exclusão' }}</button
+              ><button
+                class="btn btn-light"
+                (click)="confirmarCandidato.set(false)"
+                [disabled]="excluindo()"
+              >
+                Cancelar
+              </button>
+            </div>
+          </section>
+        }
+      </div>
+      <form class="panel candidate-upload" (ngSubmit)="adicionarFoto()" novalidate>
+        <h2>Adicionar foto</h2>
+        <p class="muted">A foto será vinculada a {{ pessoa.nome }}.</p>
+        <div class="candidate-upload-fields">
+          <div>
+            <div class="field">
+              <label for="foto-candidato">Foto</label>
+              <input
+                #campoFoto
+                id="foto-candidato"
+                type="file"
+                accept="image/png,.png"
+                (change)="selecionarFoto($event)"
+                [disabled]="enviandoFoto() || excluindo()"
+                aria-describedby="foto-ajuda foto-erro"
+              />
+              <small id="foto-ajuda" class="muted">PNG · 1080 × 1080 pixels · até 10 MB</small>
+              @if (validandoFoto()) {
+                <p class="muted" role="status">Validando imagem…</p>
+              }
+              @if (arquivoFoto(); as arquivo) {
+                <p class="selected-filename">{{ arquivo.name }}</p>
+              }
+            </div>
+            <div class="field">
+              <label for="legenda-foto">Legenda criativa</label>
+              <textarea
+                id="legenda-foto"
+                name="legendaFoto"
+                [(ngModel)]="legendaFoto"
+                rows="3"
+                maxlength="500"
+                required
+                [disabled]="enviandoFoto() || excluindo()"
+                aria-describedby="legenda-contador"
+                placeholder="Escreva uma legenda para esta foto"
+              ></textarea>
+              <div class="field-meta" id="legenda-contador">{{ legendaFoto.length }}/500</div>
+            </div>
+          </div>
+          @if (previaFoto()) {
+            <img
+              class="upload-preview"
+              [src]="previaFoto()"
+              [alt]="'Prévia da foto de ' + pessoa.nome"
+            />
+          }
+        </div>
+        @if (erroFoto()) {
+          <p id="foto-erro" class="field-error" role="alert">{{ erroFoto() }}</p>
+          @if (!arquivoFoto()) {
+            <button
+              class="btn btn-outline-primary retry-photo"
+              type="button"
+              (click)="tentarOutraFoto(campoFoto)"
+              [disabled]="enviandoFoto() || excluindo()"
+            >
+              Escolher outra foto
+            </button>
+          }
+        }
+        <button
+          class="btn btn-primary"
+          type="submit"
+          [disabled]="
+            validandoFoto() || enviandoFoto() || enviandoComentario() || carregando() || excluindo()
+          "
+        >
+          @if (enviandoFoto()) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Enviando foto…
+          } @else {
+            {{ erroFoto() && arquivoFoto() ? 'Tentar enviar novamente' : 'Adicionar foto' }}
+          }
+        </button>
+      </form>
+      @for (foto of fotos(); track $index) {
+        <article class="panel photo-detail">
+          <img
+            class="detail-image"
+            [src]="'data:image/png;base64,' + foto.imagem"
+            [alt]="foto.imagemLgenda || 'Foto de ' + pessoa.nome"
+          />
+          <div class="photo-discussion">
+            <p class="eyebrow">FOTO DO CANDIDATO</p>
+            <h2>Um olhar de {{ pessoa.nome }}</h2>
+            <p class="muted">Legenda da foto:</p>
+            <p class="caption">{{ foto.imagemLgenda }}</p>
+            <hr />
+            <h3>Comentários</h3>
+            @if (foto.erroComentarios) {
+              <p class="field-error" role="alert">{{ foto.erroComentarios }}</p>
+            }
+            @for (comentario of foto.comentarios; track $index) {
+              <article class="comment">
+                <p>{{ comentario.coment }}</p>
+                <div class="heading-actions">
+                  <time>{{ comentario.dataCriacao | date: 'dd/MM/yyyy HH:mm' }}</time
+                  ><button
+                    class="btn btn-sm btn-delete"
+                    (click)="solicitarExclusaoComentario(comentario)"
+                    [disabled]="excluindo() || enviandoComentario()"
+                    title="Excluir comentário"
+                  >
+                    Excluir
+                  </button>
+                </div>
+                @if (
+                  comentario.comentarioId &&
+                  comentarioPendente()?.comentarioId === comentario.comentarioId
+                ) {
+                  <section class="delete-confirm">
+                    <h3>Excluir este comentário?</h3>
+                    <div class="button-row">
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        (click)="excluirComentario()"
+                        [disabled]="excluindo()"
+                      >
+                        {{ excluindo() ? 'Excluindo…' : 'Confirmar exclusão' }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-light"
+                        (click)="comentarioPendente.set(null)"
+                        [disabled]="excluindo()"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </section>
+                }
+              </article>
+            } @empty {
+              @if (foto.mediaId && !foto.erroComentarios) {
+                <p class="muted">Esta foto ainda não recebeu comentários.</p>
+              }
+            }
+            <form class="photo-comment-form" (ngSubmit)="comentarFoto(foto)">
+              <div class="field">
+                <label [for]="'comentario-foto-' + $index">Seu comentário</label>
+                <textarea
+                  [id]="'comentario-foto-' + $index"
+                  [name]="'comentario-foto-' + $index"
+                  [(ngModel)]="foto.textoComentario"
+                  rows="3"
+                  maxlength="1000"
+                  required
+                  placeholder="Escreva um comentário sobre esta foto"
+                  [disabled]="
+                    !foto.mediaId ||
+                    enviandoComentario() ||
+                    enviandoFoto() ||
+                    excluindo() ||
+                    carregando()
+                  "
+                ></textarea>
+                <small class="muted"
+                  >{{ foto.textoComentario?.length || 0 }}/1000 · Seu comentário será
+                  público.</small
+                >
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="
+                  !foto.mediaId ||
+                  !foto.textoComentario?.trim() ||
+                  enviandoComentario() ||
+                  enviandoFoto() ||
+                  excluindo() ||
+                  carregando()
+                "
+              >
+                {{ enviandoComentario() ? 'Enviando…' : 'Publicar comentário' }}
+              </button>
+              @if (foto.erroEnvioComentario) {
+                <p class="field-error" role="alert">{{ foto.erroEnvioComentario }}</p>
+              }
+              @if (foto.avisoComentario) {
+                <p class="text-success" role="status">{{ foto.avisoComentario }}</p>
+              }
+            </form>
+          </div>
+        </article>
+      } @empty {
+        @if (!carregando() && !erro()) {
+          <div class="empty-state panel">
+            <h2>Nenhuma foto enviada.</h2>
+            <p>O cadastro deste candidato ainda não possui imagem.</p>
+          </div>
+        }
+      }
+    }
+  </section>
+} @else {
+  <section class="page-shell">
+    <header class="page-heading heading-actions">
+      <div>
+        <p class="eyebrow">ADMINISTRAÇÃO</p>
+        <h1>Painel de candidatos</h1>
+        <p>Acompanhe as inscrições e cuide de cada participação.</p>
+      </div>
+      <a class="btn btn-outline-primary" routerLink="/galeria"
+        >Ver galeria <span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <div class="stat-card">
+      <span class="stat-icon" aria-hidden="true">✦</span>
+      <div>
+        <strong>{{ candidatos().length }}</strong
+        ><span>Candidatos cadastrados</span>
+      </div>
+      <span class="status-pill">Inscrições</span>
+    </div>
+    <div class="panel admin-panel">
+      <div class="gallery-toolbar">
+        <div>
+          <h2>Inscrições recebidas</h2>
+          <p>Consulte os dados e gerencie os registros.</p>
+        </div>
+        <div class="toolbar-actions">
+          <label class="search-field"
+            ><span class="visually-hidden">Buscar candidato por nome ou e-mail</span
+            ><input type="search" [(ngModel)]="busca" placeholder="Buscar nome ou e-mail" /></label
+          ><button
+            class="btn btn-outline-primary"
+            (click)="carregar()"
+            [disabled]="carregando() || excluindo()"
+          >
+            Atualizar
+          </button>
+        </div>
+      </div>
+      @if (erro()) {
+        <div class="alert alert-danger" role="alert">{{ erro() }}</div>
+      }
+      @if (aviso()) {
+        <div class="alert alert-success" role="status">{{ aviso() }}</div>
+      }
+      @if (confirmar(); as candidato) {
+        <section class="delete-confirm" aria-labelledby="excluir-titulo">
+          <h3 id="excluir-titulo">Excluir a inscrição de {{ candidato.nome }}?</h3>
+          <p>A inscrição deixará de aparecer na galeria. Esta ação não pode ser desfeita.</p>
+          <div class="button-row">
+            <button class="btn btn-danger" (click)="excluir()" [disabled]="excluindo()">
+              {{ excluindo() ? 'Excluindo…' : 'Confirmar exclusão' }}</button
+            ><button class="btn btn-light" (click)="confirmar.set(null)" [disabled]="excluindo()">
+              Cancelar
+            </button>
+          </div>
+        </section>
+      }
+      @if (carregando()) {
+        <div class="empty-state" role="status">
+          <span class="spinner-border text-primary" aria-hidden="true"></span>
+          <p>Carregando inscrições…</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table candidate-table">
+            <thead>
+              <tr>
+                <th scope="col">Candidato</th>
+                <th scope="col">E-mail</th>
+                <th scope="col">Nascimento</th>
+                <th scope="col" class="actions-column">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (candidato of filtrados(); track candidato.id) {
+                <tr>
+                  <td>
+                    <span class="avatar" aria-hidden="true">{{
+                      candidato.nome.charAt(0).toUpperCase()
+                    }}</span
+                    ><strong>{{ candidato.nome }}</strong>
+                  </td>
+                  <td>{{ candidato.email }}</td>
+                  <td>{{ candidato.dataNascimento | date: 'dd/MM/yyyy' }}</td>
+                  <td class="actions-column">
+                    <a
+                      class="btn btn-sm btn-outline-primary"
+                      [routerLink]="['/admin/candidato', candidato.id]"
+                      >Ver detalhes</a
+                    ><button
+                      class="btn btn-sm btn-delete"
+                      (click)="confirmar.set(candidato)"
+                      [disabled]="excluindo()"
+                    >
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4">
+                    <div class="empty-state">
+                      <h3>
+                        {{ busca ? 'Nenhum candidato encontrado.' : 'Ainda não há inscrições.' }}
+                      </h3>
+                      <p>
+                        {{
+                          busca
+                            ? 'Tente outro nome ou e-mail.'
+                            : 'As novas participações aparecerão aqui.'
+                        }}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+}

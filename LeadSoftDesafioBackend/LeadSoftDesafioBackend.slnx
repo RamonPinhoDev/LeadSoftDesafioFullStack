@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LeadSoftDesafio.API/LeadSoftDesafio.API.csproj" />
+  <Project Path="LeadSoftDesafio.Aplication/LeadSoftDesafio.Aplication.csproj" />
+  <Project Path="LeadSoftDesafio.Domain/LeadSoftDesafio.Domain.csproj" />
+  <Project Path="LeadSoftDesafio.Infra/LeadSoftDesafio.Infra.csproj" />
+</Solution>

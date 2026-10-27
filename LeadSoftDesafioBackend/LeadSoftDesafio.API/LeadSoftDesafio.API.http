@@ -1,0 +1,6 @@
+@LeadSoftDesafio.API_HostAddress = http://localhost:5284
+
+GET {{LeadSoftDesafio.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

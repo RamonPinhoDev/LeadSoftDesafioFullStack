@@ -1,0 +1,26 @@
+# Dependências e arquivos gerados
+**/node_modules/
+**/.angular/
+**/dist/
+**/out-tsc/
+**/coverage/
+**/bin/
+**/obj/
+**/.vs/
+**/TestResults/
+*.log
+*.user
+*.suo
+Thumbs.db
+.DS_Store
+
+# Configuração local e credenciais (modelo em configuracao/)
+/LeadSoftDesafioBackend/LeadSoftDesafio.API/appsettings.json
+**/appsettings.*.local.json
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.pem
+*.key

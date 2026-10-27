@@ -1,0 +1,76 @@
+<section class="login-page page-shell">
+  <div class="login-intro">
+    <h1>Cuidar das histórias também faz parte.</h1>
+    <p>Acesse o painel para acompanhar inscrições e gerenciar os conteúdos da galeria.</p>
+    <div class="login-art" aria-hidden="true">
+      <span>✦</span>
+      <div></div>
+    </div>
+  </div>
+  <form class="panel login-card" [formGroup]="frm" (ngSubmit)="entrar()">
+    
+    <h2>Bem-vindo de volta.</h2>
+    <p class="muted">Entre com seu e-mail e sua senha.</p>
+    <div class="field">
+      <label for="login-email">E-mail</label
+      ><input
+        id="login-email"
+        formControlName="email"
+        type="email"
+        autocomplete="username"
+        placeholder="Seu e-mail de acesso"
+        [readOnly]="carregando()"
+      />
+      @if (frm.controls.email.touched && frm.controls.email.invalid) {
+        <small class="field-error">Informe um e-mail válido.</small>
+      }
+    </div>
+    <div class="field">
+      <label for="login-senha">Senha</label>
+      <div class="password-field">
+        <input
+          id="login-senha"
+          formControlName="senha"
+          [type]="mostrarSenha() ? 'text' : 'password'"
+          autocomplete="current-password"
+          placeholder="Sua senha"
+          [readOnly]="carregando()"
+        /><button
+          type="button"
+          (click)="mostrarSenha.set(!mostrarSenha())"
+          [attr.aria-pressed]="mostrarSenha()"
+        >
+          {{ mostrarSenha() ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      @if (frm.controls.senha.touched && frm.controls.senha.invalid) {
+        <small class="field-error">Informe sua senha.</small>
+      }
+    </div>
+    @if (erro()) {
+      <div class="alert alert-danger" role="alert">{{ erro() }}</div>
+    }
+    <button type="submit" class="btn btn-primary submit-button" [disabled]="carregando()">
+      @if (carregando()) {
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Verificando
+        acesso…
+      } @else {
+        Entrar no painel <span aria-hidden="true">→</span>
+      }
+    </button>
+    <p class="registration-link">
+      Ainda não tem cadastro? <a class="text-link" routerLink="/cadastro">Cadastre-se</a>
+    </p>
+    <p class="recaptcha-note">
+      Este site é protegido pelo reCAPTCHA. Aplicam-se a
+      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"
+        >Política de Privacidade</a
+      >
+      e os
+      <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer"
+        >Termos de Serviço</a
+      >
+      do Google.
+    </p>
+  </form>
+</section>

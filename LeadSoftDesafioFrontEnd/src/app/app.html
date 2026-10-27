@@ -1,0 +1,32 @@
+<a class="skip-link" href="#conteudo" (click)="pular($event)">Pular para o conteúdo</a>
+<header class="site-header">
+  <nav class="nav-shell" aria-label="Navegação principal">
+    <a
+      class="brand"
+      [routerLink]="service.estaAutenticado() ? '/galeria' : '/login'"
+      aria-label="LeadSoft — início"
+      ><span class="brand-icon" aria-hidden="true">L<span>↗</span></span
+      ><span>lead<span class="brand-soft">soft</span><small>GALERIA CRIATIVA</small></span></a
+    >
+    @if (service.estaAutenticado()) {
+      <div class="nav-links">
+        <a routerLink="/galeria" routerLinkActive="active">Galeria</a
+        ><a routerLink="/cadastro" routerLinkActive="active">Cadastrar</a>
+      </div>
+    }
+    <div class="nav-admin">
+      @if (service.estaAutenticado()) {
+        <a routerLink="/admin" routerLinkActive="active">Painel</a
+        ><button class="btn btn-outline-primary btn-sm" (click)="sair()">Sair</button>
+      }
+    </div>
+  </nav>
+</header>
+<main id="conteudo" tabindex="-1"><router-outlet /></main>
+<footer class="site-footer">
+  <div>
+    <span class="footer-brand">lead<span>soft</span></span>
+    <p>Conectando pessoas, ideias e novos olhares.</p>
+  </div>
+  <span>Um espaço para a sua criatividade.</span>
+</footer>

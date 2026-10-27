@@ -1,0 +1,48 @@
+.retry-photo {
+  margin: 0 12px 16px 0;
+}
+.photo-comment-form {
+  margin-top: 24px;
+}
+.photo-comment-form [role='status'] {
+  margin-top: 12px;
+}
+.candidate-upload {
+  padding: 30px;
+  margin: 24px 0;
+}
+.candidate-upload-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 24px;
+  align-items: start;
+}
+.upload-preview {
+  width: 200px;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--pale);
+}
+.selected-filename {
+  overflow-wrap: anywhere;
+  color: var(--blue);
+  font-size: 12px;
+  margin-top: 8px;
+}
+.candidate-upload .field-error {
+  margin-bottom: 16px;
+}
+@media (max-width: 600px) {
+  .candidate-upload {
+    padding: 23px;
+  }
+  .candidate-upload-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .upload-preview {
+    width: min(100%, 240px);
+    margin-bottom: 20px;
+  }
+}

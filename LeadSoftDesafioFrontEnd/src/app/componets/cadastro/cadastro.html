@@ -1,0 +1,130 @@
+<section class="page-shell">
+  @if (sucesso()) {
+    <div class="success-card panel">
+      <span class="success-mark" aria-hidden="true">✓</span>
+      <p class="eyebrow">CADASTRO CONCLUÍDO</p>
+      <h1>Conta cadastrada com sucesso.</h1>
+      <p>Entre com seu e-mail e a senha que você escolheu.</p>
+      <a class="btn btn-primary" routerLink="/login"
+        >Ir para o login <span aria-hidden="true">→</span></a
+      >
+    </div>
+  } @else {
+    <header class="page-heading">
+      <p class="eyebrow">CADASTRO</p>
+      <h1>Crie sua conta.</h1>
+      <p>Preencha seus dados para acessar o sistema.</p>
+      <a class="text-link" routerLink="/login">Já tem cadastro? Entrar</a>
+    </header>
+    <div class="registration-layout">
+      <form class="panel registration-form" [formGroup]="frm" (ngSubmit)="Salvar()">
+        <div class="section-heading">
+          <div>
+            <h2>Dados pessoais</h2>
+            <p>Informe os dados do seu cadastro.</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="nome">Nome completo</label
+          ><input
+            id="nome"
+            formControlName="nome"
+            autocomplete="name"
+            maxlength="120"
+            placeholder="Como você se chama?"
+            [attr.aria-invalid]="invalido('nome')"
+            aria-describedby="nome-erro"
+          />
+          @if (invalido('nome')) {
+            <small id="nome-erro" class="field-error"
+              >Informe seu nome, com pelo menos 3 caracteres.</small
+            >
+          }
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="cpf">CPF</label
+            ><input
+              id="cpf"
+              formControlName="cpf"
+              inputmode="numeric"
+              maxlength="14"
+              placeholder="000.000.000-00"
+              (input)="formatarCpf($event)"
+              [attr.aria-invalid]="invalido('cpf')"
+              aria-describedby="cpf-erro"
+            />
+            @if (invalido('cpf')) {
+              <small id="cpf-erro" class="field-error">Informe um CPF válido.</small>
+            }
+          </div>
+          <div class="field">
+            <label for="nascimento">Data de nascimento</label
+            ><input
+              id="nascimento"
+              formControlName="dataNascimento"
+              type="date"
+              autocomplete="bday"
+              min="1900-01-01"
+              [max]="hoje"
+              [attr.aria-invalid]="invalido('dataNascimento')"
+              aria-describedby="data-erro"
+            />
+            @if (invalido('dataNascimento')) {
+              <small id="data-erro" class="field-error">Informe uma data válida, até hoje.</small>
+            }
+          </div>
+        </div>
+        <div class="field">
+          <label for="email">E-mail</label
+          ><input
+            id="email"
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            maxlength="254"
+            placeholder="voce@exemplo.com"
+            [attr.aria-invalid]="invalido('email')"
+            aria-describedby="email-erro"
+          />
+          @if (invalido('email')) {
+            <small id="email-erro" class="field-error">Informe um e-mail válido.</small>
+          }
+        </div>
+        <div class="field">
+          <label for="cadastro-senha">Senha de acesso</label>
+          <input
+            id="cadastro-senha"
+            formControlName="senha"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            maxlength="128"
+            placeholder="Crie uma senha com pelo menos 8 caracteres"
+            [attr.aria-invalid]="invalido('senha')"
+            aria-describedby="senha-ajuda senha-erro"
+          />
+          <small id="senha-ajuda" class="muted"
+            >Você usará esta senha e seu e-mail para entrar.</small
+          >
+          @if (invalido('senha')) {
+            <small id="senha-erro" class="field-error"
+              >A senha deve ter entre 8 e 128 caracteres.</small
+            >
+          }
+        </div>
+        @if (erro()) {
+          <div class="alert alert-danger" role="alert">{{ erro() }}</div>
+        }
+        <button type="submit" class="btn btn-primary submit-button" [disabled]="enviando()">
+          @if (enviando()) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> {{ etapa() }}
+          } @else {
+            Cadastrar
+            <span aria-hidden="true">→</span>
+          }
+        </button>
+      </form>
+    </div>
+  }
+</section>

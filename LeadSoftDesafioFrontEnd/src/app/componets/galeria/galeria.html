@@ -1,0 +1,163 @@
+<section class="page-shell">
+  <header class="gallery-hero">
+    <div>
+      <p class="eyebrow">OLHARES QUE INSPIRAM</p>
+      <h1>Cada foto, uma história.</h1>
+      <p>Explore ideias, conheça os autores e participe da conversa.</p>
+      <a class="btn btn-primary" routerLink="/cadastro"
+        >Cadastrar <span aria-hidden="true">↗</span></a
+      >
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="art-frame">
+        <span>✦</span>
+        <div class="art-horizon"></div>
+        <div class="art-sun"></div>
+      </div>
+      <span class="art-caption">Dê espaço à sua criatividade.</span>
+    </div>
+  </header>
+  <div class="gallery-toolbar">
+    <div>
+      <h2>Galeria de participantes</h2>
+      <p>
+        {{ fotos().length }}
+        {{ fotos().length === 1 ? 'história para descobrir' : 'histórias para descobrir' }}
+      </p>
+    </div>
+    <div class="toolbar-actions">
+      <label class="search-field"
+        ><span class="visually-hidden">Buscar por autor ou legenda</span
+        ><input type="search" [(ngModel)]="busca" placeholder="Buscar autor ou legenda" /></label
+      ><button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="carregar()"
+        [disabled]="carregando()"
+      >
+        Atualizar
+      </button>
+    </div>
+  </div>
+  @if (erro()) {
+    <div class="alert alert-danger" role="alert">
+      {{ erro() }} <button class="text-link" (click)="carregar()">Tentar novamente</button>
+    </div>
+  }
+  @if (carregando()) {
+    <div class="empty-state" role="status">
+      <span class="spinner-border text-primary" aria-hidden="true"></span>
+      <p>Buscando novas histórias…</p>
+    </div>
+  } @else if (!erro() && fotos().length === 0) {
+    <div class="empty-state panel">
+      <span class="empty-symbol" aria-hidden="true">✦</span>
+      <h2>O primeiro olhar pode ser o seu.</h2>
+      <p>Adicione fotos nos detalhes de um candidato para começar a galeria.</p>
+      <a class="btn btn-primary" routerLink="/admin">Ir ao painel de candidatos</a>
+    </div>
+  } @else if (fotos().length > 0 && fotosFiltradas().length === 0) {
+    <div class="empty-state panel">
+      <h2>Nenhuma história encontrada.</h2>
+      <p>Tente outro nome ou palavra da legenda.</p>
+      <button class="btn btn-outline-primary" (click)="busca = ''">Limpar busca</button>
+    </div>
+  }
+  <div class="gallery-grid">
+    @for (foto of fotosFiltradas(); track foto.chave) {
+      <article class="photo-card">
+        <button
+          class="photo-open"
+          (click)="abrir(foto)"
+          [attr.aria-label]="'Ver foto de ' + foto.autor"
+          [disabled]="enviandoComentario()"
+        >
+          <img
+            [src]="'data:image/png;base64,' + foto.imagem"
+            [alt]="foto.imagemLgenda || 'Foto de ' + foto.autor"
+            loading="lazy"
+            width="1080"
+            height="1080"
+          />
+        </button>
+        <div class="photo-content">
+          <h3>{{ foto.autor }}</h3>
+          <p>{{ foto.imagemLgenda }}</p>
+          <button class="text-link" (click)="abrir(foto)" [disabled]="enviandoComentario()">
+            Ver foto e comentários <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </article>
+    }
+  </div>
+  @if (selecionada(); as foto) {
+    <section id="foto-detalhe" class="panel photo-detail" aria-labelledby="foto-titulo">
+      <div>
+        <img
+          class="detail-image"
+          [src]="'data:image/png;base64,' + foto.imagem"
+          [alt]="foto.imagemLgenda"
+        />
+      </div>
+      <div class="photo-discussion">
+        <div class="heading-actions">
+          <p class="eyebrow">POR TRÁS DO CLIQUE</p>
+          <button class="btn btn-light" (click)="fechar()" [disabled]="enviandoComentario()">
+            Fechar
+          </button>
+        </div>
+        <h2 id="foto-titulo">{{ foto.autor }}</h2>
+        <p class="muted">Legenda da foto:</p>
+        <p class="caption">{{ foto.imagemLgenda }}</p>
+        <hr />
+        <h3>Comentários</h3>
+        @if (foto.mediaId) {
+          @if (carregandoComentarios()) {
+            <p role="status">Carregando comentários…</p>
+          }
+          @for (comentario of comentarios(); track $index) {
+            <article class="comment">
+              <p>{{ comentario.coment }}</p>
+              <time>{{ comentario.dataCriacao | date: 'dd/MM/yyyy HH:mm' }}</time>
+            </article>
+          } @empty {
+            @if (!carregandoComentarios() && !erroComentario()) {
+              <p class="muted">Comece a conversa. Deixe o primeiro comentário.</p>
+            }
+          }
+        }
+        <form (ngSubmit)="comentar()">
+          <div class="field">
+            <label for="comentario">Seu comentário</label
+            ><textarea
+              id="comentario"
+              name="comentario"
+              [(ngModel)]="textoComentario"
+              rows="3"
+              maxlength="1000"
+              required
+              placeholder="Compartilhe o que essa foto despertou em você…"
+              [disabled]="!foto.mediaId || enviandoComentario()"
+            ></textarea
+            ><small class="muted"
+              >{{ textoComentario.length }}/1000 · Seu comentário será público.</small
+            >
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!foto.mediaId || enviandoComentario() || !textoComentario.trim()"
+          >
+            {{ enviandoComentario() ? 'Enviando…' : 'Publicar comentário' }}
+          </button>
+        </form>
+        @if (erroComentario()) {
+          <p class="field-error" role="alert">{{ erroComentario() }}</p>
+        }
+        @if (avisoComentario()) {
+          <p class="text-success" role="status">{{ avisoComentario() }}</p>
+        }
+      </div>
+    </section>
+  }
+</section>
