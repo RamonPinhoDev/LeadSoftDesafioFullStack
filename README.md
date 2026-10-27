@@ -3,6 +3,9 @@
 Desafio full stack com API em ASP.NET Core e frontend Angular, com cadastro de candidatos, fotos, comentários e painel de administração.
 <img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/4886bd12-ac95-4bd6-99c5-b4fff85454b4" />
 
+
+
+
 ## Projetos
 
 - `LeadSoftDesafioBackend/`: solução .NET 10 com API, aplicação, domínio e infraestrutura RavenDB.
