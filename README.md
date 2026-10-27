@@ -1,6 +1,7 @@
 # LeadSoftDesafioFullStack
 
 Desafio full stack com API em ASP.NET Core e frontend Angular, com cadastro de candidatos, fotos, comentários e painel de administração.
+<img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/136eaedd-4129-4e49-a6f4-cd057d4324b0" />
 
 ## Projetos
 
