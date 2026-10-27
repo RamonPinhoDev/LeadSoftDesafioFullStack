@@ -38,12 +38,3 @@ Abra `http://localhost:4200`. O proxy de desenvolvimento encaminha `/api` para a
 
 O login utiliza reCAPTCHA v3. O domínio usado precisa estar autorizado na configuração da chave no Google. O cadastro pode ser acessado pelo link da página de login.
 
-## Validar o frontend
-
-```powershell
-cd LeadSoftDesafioFrontEnd
-npm test -- --watch=false
-npm run build
-```
-
-A última validação do frontend passou em 53 testes e no build de produção. Os testes de escrita usam mocks. Mais detalhes da implementação estão no README do frontend.
